@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>転職サポートアンケート</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --ink-light: #4a4a6a;
+    --ink-muted: #9090a8;
+    --surface: #f8f7f4;
+    --card: #ffffff;
+    --accent: #059669;
+    --accent-light: #ecfdf5;
+    --accent-mid: #6ee7b7;
+    --border: #e5e3de;
+    --shadow: 0 1px 3px rgba(26,26,46,0.08), 0 4px 16px rgba(26,26,46,0.06);
+    --shadow-lg: 0 8px 32px rgba(26,26,46,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; }
+
+  .hero { background: linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%); padding: 48px 24px 56px; position: relative; overflow: hidden; }
+  .hero::before { content: '🎉'; position: absolute; top: 20px; right: 30px; font-size: 80px; opacity: 0.15; }
+  .hero::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%); }
+  .hero-inner { max-width: 640px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); color: #6ee7b7; font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px; margin-bottom: 16px; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(24px, 5vw, 36px); color: #ffffff; line-height: 1.3; margin-bottom: 12px; }
+  .hero-sub { font-size: 14px; color: #a7f3d0; line-height: 1.7; font-weight: 300; }
+
+  .congrats-banner { max-width: 640px; margin: -20px auto 0; padding: 0 16px; position: relative; z-index: 2; }
+  .congrats-card { background: white; border-radius: 12px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 12px; box-shadow: var(--shadow-lg); border-left: 4px solid var(--accent); }
+  .congrats-icon { font-size: 24px; flex-shrink: 0; }
+  .congrats-text strong { display: block; font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .congrats-text span { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+
+  .form-wrap { max-width: 640px; margin: 0 auto; padding: 32px 16px 80px; }
+  .section-label { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin: 32px 0 12px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--accent-mid); }
+
+  .card { background: var(--card); border-radius: 16px; padding: 24px; margin-bottom: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .q-num { font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: 0.05em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.5; margin-bottom: 4px; }
+  .q-note { font-size: 12px; color: var(--ink-muted); margin-bottom: 16px; }
+
+  /* 5段階評価 */
+  .stars { display: flex; gap: 8px; flex-wrap: wrap; }
+  .star-item { flex: 1; min-width: 52px; text-align: center; padding: 12px 8px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .star-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .star-item.selected { border-color: var(--accent); background: var(--accent-light); }
+  .star-num { font-size: 20px; font-weight: 700; color: var(--ink-muted); display: block; }
+  .star-item.selected .star-num { color: var(--accent); }
+  .star-label { font-size: 10px; color: var(--ink-muted); display: block; margin-top: 4px; line-height: 1.3; }
+  .star-item.selected .star-label { color: var(--accent); }
+
+  /* チェックボックス */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .option-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .option-item.selected { border-color: var(--accent); background: var(--accent-light); }
+  .check-box { width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: white; }
+  .option-item.selected .check-box { background: var(--accent); border-color: var(--accent); }
+  .check-mark { display: none; color: white; font-size: 12px; font-weight: 700; }
+  .option-item.selected .check-mark { display: block; }
+  .option-label { font-size: 14px; color: var(--ink); }
+  .option-item.selected .option-label { color: var(--accent); font-weight: 500; }
+
+  /* ラジオ */
+  .radio-options { display: flex; flex-direction: column; gap: 8px; }
+  .radio-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; }
+  .radio-item:hover { border-color: var(--accent-mid); background: var(--accent-light); }
+  .radio-item.selected { border-color: var(--accent); background: var(--accent-light); }
+  .radio-dot { width: 18px; height: 18px; border: 1.5px solid var(--border); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: white; transition: all 0.15s; }
+  .radio-item.selected .radio-dot { border-color: var(--accent); }
+  .radio-inner { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: none; }
+  .radio-item.selected .radio-inner { display: block; }
+  .radio-label { font-size: 14px; color: var(--ink); }
+  .radio-item.selected .radio-label { color: var(--accent); font-weight: 500; }
+
+  textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--ink); resize: vertical; min-height: 100px; outline: none; transition: border-color 0.15s; background: #fafaf8; line-height: 1.6; }
+  textarea:focus { border-color: var(--accent); background: white; }
+  textarea::placeholder { color: var(--ink-muted); }
+
+  .submit-wrap { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .btn-submit { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 12px; font-family: 'Noto Sans JP', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; }
+  .btn-submit:hover { background: #047857; transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  .btn-submit:active { transform: translateY(0); }
+  .submit-note { font-size: 12px; color: var(--ink-muted); text-align: center; }
+
+  .thanks { display: none; text-align: center; padding: 60px 24px; max-width: 640px; margin: 0 auto; }
+  .thanks-icon { font-size: 60px; margin-bottom: 20px; }
+  .thanks h2 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); margin-bottom: 10px; }
+  .thanks p { font-size: 14px; color: var(--ink-light); line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">ご転職おめでとうございます</div>
+    <h1>内定承諾、<br>おめでとうございます！🎉</h1>
+    <p class="hero-sub">転職活動、本当にお疲れさまでした。<br>新しいスタートを心よりお祝い申し上げます。</p>
+  </div>
+</div>
+
+<div class="congrats-banner">
+  <div class="congrats-card">
+    <div class="congrats-icon">📋</div>
+    <div class="congrats-text">
+      <strong>転職サポートについてお聞かせください</strong>
+      <span>所要時間は約3分です。いただいた回答は統計的に処理され、担当者への個人評価には使用しません。</span>
+    </div>
+  </div>
+</div>
+
+<div class="form-wrap" id="formWrap">
+
+  <div class="section-label">総合的な満足度</div>
+
+  <div class="card">
+    <div class="q-num">Q1</div>
+    <div class="q-text">今回の転職サポート全体を通じて、満足度を教えてください</div>
+    <div class="q-note">1が低く、5が高い評価です</div>
+    <div class="stars" id="q1">
+      <div class="star-item" onclick="selectStar(this, 'q1')"><span class="star-num">1</span><span class="star-label">期待を<br>下回った</span></div>
+      <div class="star-item" onclick="selectStar(this, 'q1')"><span class="star-num">2</span><span class="star-label"></span></div>
+      <div class="star-item" onclick="selectStar(this, 'q1')"><span class="star-num">3</span><span class="star-label">普通</span></div>
+      <div class="star-item" onclick="selectStar(this, 'q1')"><span class="star-num">4</span><span class="star-label"></span></div>
+      <div class="star-item" onclick="selectStar(this, 'q1')"><span class="star-num">5</span><span class="star-label">とても<br>満足</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q-num">Q2</div>
+    <div class="q-text">このサービスを友人・知人に勧めたいと思いますか？</div>
+    <div class="radio-options" id="q2">
+      <div class="radio-item" onclick="selectRadio(this, 'q2')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">ぜひ勧めたい</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q2')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">どちらともいえない</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q2')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">あまり勧めたくない</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">サポート内容について</div>
+
+  <div class="card">
+    <div class="q-num">Q3</div>
+    <div class="q-text">特によかったと感じたサポートはどれですか？</div>
+    <div class="q-note">複数選択できます</div>
+    <div class="options" id="q3">
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">話をじっくり聞いてもらえた</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">自分に合った求人を紹介してもらえた</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">面接対策が役に立った</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">書類（履歴書・職務経歴書）のアドバイスが助かった</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">条件交渉をうまく進めてもらえた</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">不安なときに相談に乗ってもらえた</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">特になし</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q-num">Q4</div>
+    <div class="q-text">もう少し充実してほしかった点はありますか？</div>
+    <div class="q-note">複数選択できます</div>
+    <div class="options" id="q4">
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">求人の数・幅をもっと広げてほしかった</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">企業の内部情報・社風をもっと教えてほしかった</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">連絡のスピードをもっと早くしてほしかった</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">面接対策をもっとしてほしかった</span></div>
+      <div class="option-item" onclick="toggleOption(this)"><div class="check-box"><span class="check-mark">✓</span></div><span class="option-label">特になし</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">転職活動を振り返って</div>
+
+  <div class="card">
+    <div class="q-num">Q5</div>
+    <div class="q-text">転職活動中、一番不安だったことは何ですか？</div>
+    <div class="radio-options" id="q5">
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">年収が下がらないか</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">職場環境が自分に合うか</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">スキルが通用するか</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">転職タイミングの見極め</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">内定がもらえるか</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">家族の理解</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q5')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">特になし</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="q-num">Q6</div>
+    <div class="q-text">今回の転職活動にかかった期間はどのくらいでしたか？</div>
+    <div class="radio-options" id="q6">
+      <div class="radio-item" onclick="selectRadio(this, 'q6')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">1ヶ月以内</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q6')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">1〜3ヶ月</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q6')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">3〜6ヶ月</span></div>
+      <div class="radio-item" onclick="selectRadio(this, 'q6')"><div class="radio-dot"><div class="radio-inner"></div></div><span class="radio-label">6ヶ月以上</span></div>
+    </div>
+  </div>
+
+  <div class="section-label">担当CAについて</div>
+
+  <div class="card">
+    <div class="q-num">Q7</div>
+    <div class="q-text">担当CAのお名前を教えてください</div>
+    <div class="q-note">CA別に集計するために使用します</div>
+    <textarea id="q_ca" placeholder="例：田中" style="min-height: 52px;"></textarea>
+  </div>
+
+  <div class="section-label">ご感想・メッセージ</div>
+
+  <div class="card">
+    <div class="q-num">Q8　任意</div>
+    <div class="q-text">担当CAへのメッセージや、サービスへのご意見があればぜひ教えてください</div>
+    <div class="q-note">どんな些細なことでも大歓迎です</div>
+    <textarea id="q7" placeholder="例：最初は不安だらけでしたが、丁寧に相談に乗っていただいて安心できました。ありがとうございました！"></textarea>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitForm()">回答を送信する</button>
+    <p class="submit-note">ご回答いただいた内容は今後のサービス改善に活用させていただきます</p>
+  </div>
+</div>
+
+<div class="thanks" id="thanks">
+  <div class="thanks-icon">🌟</div>
+  <h2>ありがとうございました！</h2>
+  <p>貴重なご意見をお聞かせいただき、誠にありがとうございます。<br>新しい職場でのご活躍を心よりお祈り申し上げます。<br><br>またいつでもお気軽にご相談ください。</p>
+</div>
+
+<script>
+var FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfm-1XFYqICiqcKQrQLCA1FWFcJxOzdUjeHtYZR31g6i6MUgA/formResponse';
+var ENTRY = {
+  q1: 'entry.249065199',
+  q2: 'entry.558960116',
+  q3: 'entry.1138133345',
+  q4: 'entry.448301747',
+  q5: 'entry.1279164862',
+  q6: 'entry.2123668206',
+  q7: 'entry.953761467',
+  ca: 'entry.849731025'
+};
+
+function selectStar(el, groupId) {
+  var items = document.querySelectorAll('#' + groupId + ' .star-item');
+  items.forEach(function(i) { i.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function selectRadio(el, groupId) {
+  var items = document.querySelectorAll('#' + groupId + ' .radio-item');
+  items.forEach(function(i) { i.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function toggleOption(el) {
+  el.classList.toggle('selected');
+}
+
+function submitForm() {
+  var params = new URLSearchParams();
+
+  // Q1: 満足度（星の番号）
+  var stars = document.querySelectorAll('#q1 .star-item');
+  var q1val = '';
+  stars.forEach(function(s, i) {
+    if (s.classList.contains('selected')) q1val = (i + 1) + '（' + (i === 0 ? '期待を下回った' : i === 2 ? '普通' : i === 4 ? 'とても満足' : '') + '）';
+  });
+  if (q1val) params.append(ENTRY.q1, q1val.replace('（）', ''));
+
+  // Q2: 推薦意向
+  var q2el = document.querySelector('#q2 .radio-item.selected .radio-label');
+  if (q2el) params.append(ENTRY.q2, q2el.textContent.trim());
+
+  // Q3: よかった点（複数）
+  document.querySelectorAll('#q3 .option-item.selected .option-label').forEach(function(el) {
+    params.append(ENTRY.q3, el.textContent.trim());
+  });
+
+  // Q4: 改善点（複数）
+  document.querySelectorAll('#q4 .option-item.selected .option-label').forEach(function(el) {
+    params.append(ENTRY.q4, el.textContent.trim());
+  });
+
+  // Q5: 不安だったこと
+  var q5el = document.querySelector('#q5 .radio-item.selected .radio-label');
+  if (q5el) params.append(ENTRY.q5, q5el.textContent.trim());
+
+  // Q6: 活動期間
+  var q6el = document.querySelector('#q6 .radio-item.selected .radio-label');
+  if (q6el) params.append(ENTRY.q6, q6el.textContent.trim());
+
+  // CA名
+  var qca = document.getElementById('q_ca').value;
+  if (qca) params.append(ENTRY.ca, qca);
+
+  // Q7: 自由記述
+  var q7 = document.getElementById('q7').value;
+  if (q7) params.append(ENTRY.q7, q7);
+
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.name = 'hidden_iframe';
+  document.body.appendChild(iframe);
+
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = FORM_ACTION;
+  form.target = 'hidden_iframe';
+
+  params.forEach(function(value, key) {
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(function() {
+    document.getElementById('formWrap').style.display = 'none';
+    document.querySelector('.hero').style.display = 'none';
+    document.querySelector('.congrats-banner').style.display = 'none';
+    var thanks = document.getElementById('thanks');
+    thanks.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 500);
+}
+</script>
+</body>
+</html>
